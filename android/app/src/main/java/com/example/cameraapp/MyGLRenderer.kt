@@ -26,13 +26,35 @@ class MyGLRenderer : GLSurfaceView.Renderer {
             }
         """
         
-        // Fragment shader for rendering texture
+        // Fragment shader for rendering texture with effects
         private const val fragmentShaderCode = """
             precision mediump float;
             uniform sampler2D uTexture;
+            uniform int uEffect;
             varying vec2 texCoord;
             void main() {
-                gl_FragColor = texture2D(uTexture, texCoord);
+                vec4 color = texture2D(uTexture, texCoord);
+                
+                if (uEffect == 0) {
+                    // Normal
+                    gl_FragColor = color;
+                } else if (uEffect == 1) {
+                    // Invert colors
+                    gl_FragColor = vec4(1.0 - color.rgb, color.a);
+                } else if (uEffect == 2) {
+                    // Grayscale
+                    float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+                    gl_FragColor = vec4(gray, gray, gray, color.a);
+                } else if (uEffect == 3) {
+                    // Sepia
+                    float r = dot(color.rgb, vec3(0.393, 0.769, 0.189));
+                    float g = dot(color.rgb, vec3(0.349, 0.686, 0.168));
+                    float b = dot(color.rgb, vec3(0.272, 0.534, 0.131));
+                    gl_FragColor = vec4(r, g, b, color.a);
+                } else {
+                    // Default
+                    gl_FragColor = color;
+                }
             }
         """
     }
@@ -44,6 +66,8 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     private var positionHandle = 0
     private var texCoordHandle = 0
     private var textureHandle = 0
+    private var effectHandle = 0
+    private var currentEffect = 0 // 0=normal, 1=invert, 2=grayscale, 3=sepia
     
     // Quad vertices (position + texture coordinates)
     private val quadVertices = floatArrayOf(
@@ -83,6 +107,7 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         positionHandle = GLES20.glGetAttribLocation(program, "vPosition")
         texCoordHandle = GLES20.glGetAttribLocation(program, "vTexCoord")
         textureHandle = GLES20.glGetUniformLocation(program, "uTexture")
+        effectHandle = GLES20.glGetUniformLocation(program, "uEffect")
         
         Log.d(TAG, "OpenGL setup complete")
     }
@@ -148,6 +173,9 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
         GLES20.glUniform1i(textureHandle, 0)
         
+        // Set effect
+        GLES20.glUniform1i(effectHandle, currentEffect)
+        
         // Draw
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, quadIndices.size, GLES20.GL_UNSIGNED_SHORT, indexBuffer)
         
@@ -203,5 +231,20 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         }
         
         return shader
+    }
+    
+    fun setEffect(effect: Int) {
+        currentEffect = effect
+        Log.d(TAG, "Effect changed to: $effect")
+    }
+    
+    fun getEffectName(): String {
+        return when (currentEffect) {
+            0 -> "Normal"
+            1 -> "Invert"
+            2 -> "Grayscale"
+            3 -> "Sepia"
+            else -> "Unknown"
+        }
     }
 }

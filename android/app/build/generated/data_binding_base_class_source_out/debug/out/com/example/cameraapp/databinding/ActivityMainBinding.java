@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
@@ -22,6 +23,12 @@ public final class ActivityMainBinding implements ViewBinding {
   private final RelativeLayout rootView;
 
   @NonNull
+  public final Button effectButton;
+
+  @NonNull
+  public final TextView fpsText;
+
+  @NonNull
   public final GLSurfaceView glSurfaceView;
 
   @NonNull
@@ -30,13 +37,20 @@ public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   public final TextureView textureView;
 
-  private ActivityMainBinding(@NonNull RelativeLayout rootView,
-      @NonNull GLSurfaceView glSurfaceView, @NonNull Button saveFrameButton,
-      @NonNull TextureView textureView) {
+  @NonNull
+  public final Button toggleButton;
+
+  private ActivityMainBinding(@NonNull RelativeLayout rootView, @NonNull Button effectButton,
+      @NonNull TextView fpsText, @NonNull GLSurfaceView glSurfaceView,
+      @NonNull Button saveFrameButton, @NonNull TextureView textureView,
+      @NonNull Button toggleButton) {
     this.rootView = rootView;
+    this.effectButton = effectButton;
+    this.fpsText = fpsText;
     this.glSurfaceView = glSurfaceView;
     this.saveFrameButton = saveFrameButton;
     this.textureView = textureView;
+    this.toggleButton = toggleButton;
   }
 
   @Override
@@ -66,6 +80,18 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.effectButton;
+      Button effectButton = ViewBindings.findChildViewById(rootView, id);
+      if (effectButton == null) {
+        break missingId;
+      }
+
+      id = R.id.fpsText;
+      TextView fpsText = ViewBindings.findChildViewById(rootView, id);
+      if (fpsText == null) {
+        break missingId;
+      }
+
       id = R.id.glSurfaceView;
       GLSurfaceView glSurfaceView = ViewBindings.findChildViewById(rootView, id);
       if (glSurfaceView == null) {
@@ -84,8 +110,14 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((RelativeLayout) rootView, glSurfaceView, saveFrameButton,
-          textureView);
+      id = R.id.toggleButton;
+      Button toggleButton = ViewBindings.findChildViewById(rootView, id);
+      if (toggleButton == null) {
+        break missingId;
+      }
+
+      return new ActivityMainBinding((RelativeLayout) rootView, effectButton, fpsText,
+          glSurfaceView, saveFrameButton, textureView, toggleButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -10,9 +10,12 @@ color teal_200
 color teal_700
 color white
 drawable ic_launcher_foreground
+id effectButton
+id fpsText
 id glSurfaceView
 id saveFrameButton
 id textureView
+id toggleButton
 layout activity_main
 mipmap ic_launcher
 mipmap ic_launcher_round

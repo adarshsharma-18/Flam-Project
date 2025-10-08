@@ -31,5 +31,49 @@
         android:padding="12dp"
         android:elevation="8dp" />
 
+    <Button
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔄 Show Raw"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF6B6B"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:elevation="8dp" />
+
+    <TextView
+        android:id="@+id/fpsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#00FF88"
+        android:text="FPS: 0"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:background="#80000000"
+        android:padding="8dp"
+        android:elevation="4dp" />
+
+    <Button
+        android:id="@+id/effectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🎨 Normal"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#9C27B0"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:elevation="4dp" />
+
 </RelativeLayout>
 

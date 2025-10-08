@@ -12,7 +12,9 @@ import android.util.Log
 import android.opengl.GLSurfaceView
 import android.view.Surface
 import android.view.TextureView
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -64,6 +66,9 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private lateinit var glSurfaceView: GLSurfaceView
     private lateinit var glRenderer: MyGLRenderer
     private lateinit var saveFrameButton: Button
+    private lateinit var toggleButton: Button
+    private lateinit var effectButton: Button
+    private lateinit var fpsText: TextView
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
     private var backgroundHandler: Handler? = null
@@ -74,6 +79,11 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private var frameSaved = false
     private var currentProcessedFrame: Bitmap? = null
     private val webProjectPath = "C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\web"
+    
+    // Toggle and FPS variables
+    private var showProcessed = true
+    private var lastTime = System.currentTimeMillis()
+    private var frameCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +94,9 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             textureView = findViewById(R.id.textureView)
             glSurfaceView = findViewById(R.id.glSurfaceView)
             saveFrameButton = findViewById(R.id.saveFrameButton)
+            toggleButton = findViewById(R.id.toggleButton)
+            effectButton = findViewById(R.id.effectButton)
+            fpsText = findViewById(R.id.fpsText)
             
             textureView.surfaceTextureListener = this
             
@@ -96,6 +109,43 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             // Setup save button
             saveFrameButton.setOnClickListener {
                 saveCurrentFrameToWeb()
+            }
+            
+            // Setup toggle button
+            toggleButton.setOnClickListener {
+                showProcessed = !showProcessed
+                toggleButton.text = if (showProcessed) "🔄 Show Raw" else "🔄 Show Processed"
+                
+                // Switch between TextureView and GLSurfaceView
+                if (showProcessed) {
+                    // Show processed view (GLSurfaceView on top)
+                    glSurfaceView.visibility = View.VISIBLE
+                    glSurfaceView.bringToFront()
+                } else {
+                    // Show raw camera feed (hide GLSurfaceView)
+                    glSurfaceView.visibility = View.GONE
+                }
+                
+                Log.d(TAG, "View toggled to: ${if (showProcessed) "Processed" else "Raw"}")
+            }
+            
+            // Setup effect button
+            effectButton.setOnClickListener {
+                val currentEffect = (glRenderer.getEffectName().let {
+                    when (it) {
+                        "Normal" -> 0
+                        "Invert" -> 1
+                        "Grayscale" -> 2
+                        "Sepia" -> 3
+                        else -> 0
+                    }
+                } + 1) % 4
+                
+                glRenderer.setEffect(currentEffect)
+                effectButton.text = "🎨 ${glRenderer.getEffectName()}"
+                glSurfaceView.requestRender()
+                
+                Log.d(TAG, "Effect changed to: ${glRenderer.getEffectName()}")
             }
 
             Log.d(TAG, "App UI initialized successfully")
@@ -354,6 +404,19 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+        // FPS Counter
+        frameCount++
+        val now = System.currentTimeMillis()
+        if (now - lastTime >= 1000) {  // every 1 sec
+            val fps = frameCount
+            Log.d("PERFORMANCE", "FPS: $fps")
+            runOnUiThread {
+                fpsText.text = "FPS: $fps"
+            }
+            frameCount = 0
+            lastTime = now
+        }
+        
         // Skip processing if edge detection not ready
         if (!isOpenCVInitialized) {
             return

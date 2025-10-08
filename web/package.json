@@ -1,16 +1,29 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Edge Detection Web Viewer with Mock API",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
+    "start": "node server.js",
+    "dev": "npx http-server -p 3000",
+    "api": "node server.js",
+    "build": "npx tsc main.ts --target ES2017 --lib DOM,ES2017 --skipLibCheck",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "edge-detection",
+    "opencv",
+    "webgl",
+    "computer-vision"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "http-server": "^14.1.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
   }
 }
