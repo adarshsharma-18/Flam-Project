@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,10 +21,15 @@ public final class ActivityMainBinding implements ViewBinding {
   private final RelativeLayout rootView;
 
   @NonNull
+  public final ImageView imageView;
+
+  @NonNull
   public final TextureView textureView;
 
-  private ActivityMainBinding(@NonNull RelativeLayout rootView, @NonNull TextureView textureView) {
+  private ActivityMainBinding(@NonNull RelativeLayout rootView, @NonNull ImageView imageView,
+      @NonNull TextureView textureView) {
     this.rootView = rootView;
+    this.imageView = imageView;
     this.textureView = textureView;
   }
 
@@ -54,13 +60,19 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.imageView;
+      ImageView imageView = ViewBindings.findChildViewById(rootView, id);
+      if (imageView == null) {
+        break missingId;
+      }
+
       id = R.id.textureView;
       TextureView textureView = ViewBindings.findChildViewById(rootView, id);
       if (textureView == null) {
         break missingId;
       }
 
-      return new ActivityMainBinding((RelativeLayout) rootView, textureView);
+      return new ActivityMainBinding((RelativeLayout) rootView, imageView, textureView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

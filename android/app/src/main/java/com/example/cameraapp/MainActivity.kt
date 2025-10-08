@@ -4,15 +4,21 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.SurfaceTexture
+import android.graphics.Bitmap
 import android.hardware.camera2.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.view.Surface
 import android.view.TextureView
+import android.widget.ImageView
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.core.Mat
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private val requestCode = 1001
 
     private lateinit var textureView: TextureView
+    private lateinit var imageView: ImageView
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
     private var backgroundThread: HandlerThread? = null
@@ -30,7 +37,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         textureView = findViewById(R.id.textureView)
+        imageView = findViewById(R.id.imageView)
         textureView.surfaceTextureListener = surfaceTextureListener
+
+        try {
+            // Ensure OpenCV native is loaded when using local SDK
+            System.loadLibrary("opencv_java4")
+        } catch (t: Throwable) {
+            Log.e("MainActivity", "Failed to load opencv_java4", t)
+        }
+        val ok = try { OpenCVLoader.initDebug() } catch (t: Throwable) { false }
+        if (!ok) {
+            Log.e("MainActivity", "OpenCVLoader.initDebug() failed")
+        }
 
         if (!hasCameraPermission()) {
             ActivityCompat.requestPermissions(this, arrayOf(cameraPermission), requestCode)
@@ -79,7 +98,21 @@ class MainActivity : AppCompatActivity() {
         }
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {}
         override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+            val bitmap: Bitmap = textureView.bitmap ?: return
+            try {
+                val inputMat = Mat()
+                Utils.bitmapToMat(bitmap, inputMat)
+                val outputMat = Mat()
+                processFrameJNI(inputMat.nativeObjAddr, outputMat.nativeObjAddr)
+                Utils.matToBitmap(outputMat, bitmap)
+                runOnUiThread { imageView.setImageBitmap(bitmap) }
+                inputMat.release()
+                outputMat.release()
+            } catch (t: Throwable) {
+                Log.e("MainActivity", "Frame processing failed", t)
+            }
+        }
     }
 
     private fun startBackgroundThread() {
@@ -148,6 +181,14 @@ class MainActivity : AppCompatActivity() {
         captureSession = null
         cameraDevice?.close()
         cameraDevice = null
+    }
+
+    external fun processFrameJNI(matAddrInput: Long, matAddrOutput: Long)
+
+    companion object {
+        init {
+            System.loadLibrary("native-lib")
+        }
     }
 }
 

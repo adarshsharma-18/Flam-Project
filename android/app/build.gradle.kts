@@ -15,6 +15,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -40,6 +43,20 @@ android {
 
     buildFeatures {
         viewBinding = true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+        }
+    }
+    sourceSets {
+        val main by getting
+        with(main.java) {
+            srcDir("src/main/sdk/sdk/java/src")
+            (this as org.gradle.api.tasks.util.PatternFilterable).exclude("org/opencv/android/**")
+        }
+        main.jniLibs.srcDir("src/main/sdk/sdk/native/libs")
     }
 }
 

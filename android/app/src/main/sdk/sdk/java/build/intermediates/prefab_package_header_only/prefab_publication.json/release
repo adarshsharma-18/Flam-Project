@@ -1,0 +1,17 @@
+{
+  "installationFolder": "C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\android\\app\\src\\main\\sdk\\sdk\\java\\build\\intermediates\\prefab_package\\release\\prefab",
+  "gradlePath": ":openCV",
+  "packageInfo": {
+    "packageName": "openCV",
+    "packageSchemaVersion": 2,
+    "packageDependencies": [],
+    "modules": [
+      {
+        "moduleName": "opencv_jni_shared",
+        "moduleHeaders": "C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\android\\app\\src\\main\\sdk\\sdk\\java\\native\\jni\\include",
+        "moduleExportLibraries": [],
+        "abis": []
+      }
+    ]
+  }
+}

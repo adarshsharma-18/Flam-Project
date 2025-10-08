@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/.cxx/Debug/5p3j1j1t/x86_64",
+  "command": "C:\\Users\\ADARSH~1\\AppData\\Local\\Android\\Sdk\\ndk\\261~1.109\\TOOLCH~1\\llvm\\prebuilt\\WINDOW~1\\bin\\CLANG_~1.EXE --target=x86_64-none-linux-android21 --sysroot=\"C:/Users/Adarsh Sharma/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot\" -Dnative_lib_EXPORTS -isystem \"C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/src/main/sdk/sdk/native/jni/include\" -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles\\native-lib.dir\\native-lib.cpp.o -c \"C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\android\\app\\src\\main\\cpp\\native-lib.cpp\"",
+  "file": "C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\android\\app\\src\\main\\cpp\\native-lib.cpp"
+}
+]
