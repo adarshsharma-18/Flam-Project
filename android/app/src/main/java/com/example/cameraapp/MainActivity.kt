@@ -9,9 +9,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import android.opengl.GLSurfaceView
 import android.view.Surface
 import android.view.TextureView
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -54,7 +54,8 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     */
 
     private lateinit var textureView: TextureView
-    private lateinit var imageView: ImageView
+    private lateinit var glSurfaceView: GLSurfaceView
+    private lateinit var glRenderer: MyGLRenderer
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
     private var backgroundHandler: Handler? = null
@@ -70,9 +71,15 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             setContentView(R.layout.activity_main)
 
             textureView = findViewById(R.id.textureView)
-            imageView = findViewById(R.id.imageView)
+            glSurfaceView = findViewById(R.id.glSurfaceView)
             
             textureView.surfaceTextureListener = this
+            
+            // Initialize OpenGL ES
+            glSurfaceView.setEGLContextClientVersion(2)
+            glRenderer = MyGLRenderer()
+            glSurfaceView.setRenderer(glRenderer)
+            glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
             Log.d(TAG, "App UI initialized successfully")
 
@@ -193,6 +200,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         super.onResume()
         Log.d(TAG, "onResume called")
         startBackgroundThread()
+        glSurfaceView.onResume()
         if (textureView.isAvailable) {
             Log.d(TAG, "TextureView available, opening camera")
             openCamera()
@@ -205,6 +213,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     override fun onPause() {
         closeCamera()
         stopBackgroundThread()
+        glSurfaceView.onPause()
         super.onPause()
     }
 
@@ -257,7 +266,9 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 val edgeBitmap = applySimpleEdgeDetection(bmpCopy)
 
                 runOnUiThread {
-                    imageView.setImageBitmap(edgeBitmap)
+                    // Update OpenGL texture with edge detection result
+                    glRenderer.updateBitmap(edgeBitmap)
+                    glSurfaceView.requestRender()
                 }
 
                 bmpCopy.recycle()

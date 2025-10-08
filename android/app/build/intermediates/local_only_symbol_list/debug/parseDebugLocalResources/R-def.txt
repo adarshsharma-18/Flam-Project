@@ -10,7 +10,7 @@ color teal_200
 color teal_700
 color white
 drawable ic_launcher_foreground
-id imageView
+id glSurfaceView
 id textureView
 layout activity_main
 mipmap ic_launcher
