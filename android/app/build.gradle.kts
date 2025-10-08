@@ -15,9 +15,10 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
-        }
+        // NDK temporarily disabled for camera-only version
+        // ndk {
+        //     abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        // }
     }
 
     buildTypes {
@@ -45,19 +46,21 @@ android {
         viewBinding = true
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-        }
-    }
-    sourceSets {
-        val main by getting
-        with(main.java) {
-            srcDir("src/main/sdk/sdk/java/src")
-            (this as org.gradle.api.tasks.util.PatternFilterable).exclude("org/opencv/android/**")
-        }
-        main.jniLibs.srcDir("src/main/sdk/sdk/native/libs")
-    }
+    // Temporarily disabled for debugging
+    // externalNativeBuild {
+    //     cmake {
+    //         path = file("src/main/cpp/CMakeLists.txt")
+    //     }
+    // }
+    // OpenCV source sets disabled due to stability issues
+    // sourceSets {
+    //     val main by getting
+    //     with(main.java) {
+    //         srcDir("src/main/sdk/sdk/java/src")
+    //         (this as org.gradle.api.tasks.util.PatternFilterable).exclude("org/opencv/android/**")
+    //     }
+    //     main.jniLibs.srcDir("src/main/sdk/sdk/native/libs")
+    // }
 }
 
 dependencies {
@@ -65,5 +68,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    
+    // Using pure Android approach - no external dependencies needed
 }
 

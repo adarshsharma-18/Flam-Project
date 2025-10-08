@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 project("edge_detection")
 
+# Find log library for logging
+find_library(log-lib log)
+
 # Use local OpenCV Android SDK via OpenCV_DIR
 # Expected local SDK path: app/src/main/sdk/sdk/native/jni
 set(_LOCAL_OPENCV_DIR "${CMAKE_CURRENT_LIST_DIR}/../sdk/sdk/native/jni")
@@ -12,5 +15,5 @@ find_package(OpenCV REQUIRED)
 add_library(native-lib SHARED native-lib.cpp)
 
 target_include_directories(native-lib PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(native-lib ${OpenCV_LIBS})
+target_link_libraries(native-lib ${OpenCV_LIBS} ${log-lib})
 

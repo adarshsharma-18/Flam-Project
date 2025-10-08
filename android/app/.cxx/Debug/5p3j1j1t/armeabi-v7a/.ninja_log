@@ -1,0 +1,6 @@
+# ninja log v5
+0	2650	7816330545738536	CMakeFiles/native-lib.dir/native-lib.cpp.o	d699e968b31557c
+2664	3831	7816330557298577	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/armeabi-v7a/libnative-lib.so	bf50533b2213bf42
+1	15	0	clean	c6b241276bf354df
+22	3558	7816340451825815	CMakeFiles/native-lib.dir/native-lib.cpp.o	d699e968b31557c
+3559	4658	7816340462731980	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/armeabi-v7a/libnative-lib.so	bf50533b2213bf42

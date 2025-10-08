@@ -1,3 +1,11 @@
 # ninja log v5
-1	2751	7815710120608127	CMakeFiles/native-lib.dir/native-lib.cpp.o	fa2913c8a78e943c
-2762	3835	7815710131372703	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/x86_64/libnative-lib.so	de996604311ec4c3
+9	3659	7816220934390117	CMakeFiles/native-lib.dir/native-lib.cpp.o	fa2913c8a78e943c
+3660	6215	7816220958673573	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/x86_64/libnative-lib.so	de996604311ec4c3
+11	3130	7816321624269486	CMakeFiles/native-lib.dir/native-lib.cpp.o	fa2913c8a78e943c
+3131	4728	7816321639999025	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/x86_64/libnative-lib.so	101b0aebdcbcaead
+1	12	0	clean	c6b241276bf354df
+24	6834	7816330627445564	CMakeFiles/native-lib.dir/native-lib.cpp.o	fa2913c8a78e943c
+6835	8803	7816330646718727	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/x86_64/libnative-lib.so	101b0aebdcbcaead
+0	10	0	clean	c6b241276bf354df
+14	8134	7816340553687187	CMakeFiles/native-lib.dir/native-lib.cpp.o	fa2913c8a78e943c
+8136	10697	7816340578399536	C:/Users/Adarsh Sharma/code/project/FLAM-project/android/app/build/intermediates/cxx/Debug/5p3j1j1t/obj/x86_64/libnative-lib.so	101b0aebdcbcaead
