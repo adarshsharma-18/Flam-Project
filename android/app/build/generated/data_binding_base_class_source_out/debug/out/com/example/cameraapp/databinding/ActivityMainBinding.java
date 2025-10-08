@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,12 +25,17 @@ public final class ActivityMainBinding implements ViewBinding {
   public final GLSurfaceView glSurfaceView;
 
   @NonNull
+  public final Button saveFrameButton;
+
+  @NonNull
   public final TextureView textureView;
 
   private ActivityMainBinding(@NonNull RelativeLayout rootView,
-      @NonNull GLSurfaceView glSurfaceView, @NonNull TextureView textureView) {
+      @NonNull GLSurfaceView glSurfaceView, @NonNull Button saveFrameButton,
+      @NonNull TextureView textureView) {
     this.rootView = rootView;
     this.glSurfaceView = glSurfaceView;
+    this.saveFrameButton = saveFrameButton;
     this.textureView = textureView;
   }
 
@@ -66,13 +72,20 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.saveFrameButton;
+      Button saveFrameButton = ViewBindings.findChildViewById(rootView, id);
+      if (saveFrameButton == null) {
+        break missingId;
+      }
+
       id = R.id.textureView;
       TextureView textureView = ViewBindings.findChildViewById(rootView, id);
       if (textureView == null) {
         break missingId;
       }
 
-      return new ActivityMainBinding((RelativeLayout) rootView, glSurfaceView, textureView);
+      return new ActivityMainBinding((RelativeLayout) rootView, glSurfaceView, saveFrameButton,
+          textureView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

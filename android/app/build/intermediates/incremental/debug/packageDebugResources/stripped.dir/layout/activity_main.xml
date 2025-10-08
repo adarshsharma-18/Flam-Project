@@ -17,5 +17,19 @@
         android:layout_margin="16dp"
         android:background="#80000000" />
 
+    <Button
+        android:id="@+id/saveFrameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:text="📸 Save Frame"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#00FF88"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:elevation="8dp" />
+
 </RelativeLayout>
 

@@ -11,6 +11,7 @@ color teal_700
 color white
 drawable ic_launcher_foreground
 id glSurfaceView
+id saveFrameButton
 id textureView
 layout activity_main
 mipmap ic_launcher

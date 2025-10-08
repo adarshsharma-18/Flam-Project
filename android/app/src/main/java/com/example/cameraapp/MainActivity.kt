@@ -12,8 +12,12 @@ import android.util.Log
 import android.opengl.GLSurfaceView
 import android.view.Surface
 import android.view.TextureView
+import android.widget.Button
+import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     companion object {
         private const val TAG = "MainActivity"
         private const val CAMERA_PERMISSION_REQUEST_CODE = 200
+        private const val STORAGE_PERMISSION_REQUEST_CODE = 201
     }
     
     private var isOpenCVInitialized = false
@@ -58,6 +63,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private lateinit var textureView: TextureView
     private lateinit var glSurfaceView: GLSurfaceView
     private lateinit var glRenderer: MyGLRenderer
+    private lateinit var saveFrameButton: Button
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
     private var backgroundHandler: Handler? = null
@@ -66,6 +72,8 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private val processingExecutor = Executors.newSingleThreadExecutor()
     private val isProcessing = AtomicBoolean(false)
     private var frameSaved = false
+    private var currentProcessedFrame: Bitmap? = null
+    private val webProjectPath = "C:\\Users\\Adarsh Sharma\\code\\project\\FLAM-project\\web"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +83,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
             textureView = findViewById(R.id.textureView)
             glSurfaceView = findViewById(R.id.glSurfaceView)
+            saveFrameButton = findViewById(R.id.saveFrameButton)
             
             textureView.surfaceTextureListener = this
             
@@ -84,15 +93,15 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             glSurfaceView.setRenderer(glRenderer)
             glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
+            // Setup save button
+            saveFrameButton.setOnClickListener {
+                saveCurrentFrameToWeb()
+            }
+
             Log.d(TAG, "App UI initialized successfully")
 
-            // Check camera permission and start camera immediately
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
-            } else {
-                // Start camera immediately if permission is already granted
-                Log.d(TAG, "Camera permission already granted, starting camera")
-            }
+            // Check permissions and start camera
+            checkAndRequestPermissions()
 
             // Initialize RenderScript for edge detection
             initializeRenderScript()
@@ -153,6 +162,48 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         }, 2000) // Wait 2 seconds
     }
     
+    private fun checkAndRequestPermissions() {
+        val permissionsNeeded = mutableListOf<String>()
+        
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.CAMERA)
+        }
+        
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        
+        if (permissionsNeeded.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsNeeded.toTypedArray(), CAMERA_PERMISSION_REQUEST_CODE)
+        } else {
+            Log.d(TAG, "All permissions already granted")
+        }
+    }
+    
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        when (requestCode) {
+            CAMERA_PERMISSION_REQUEST_CODE -> {
+                var allGranted = true
+                for (result in grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        allGranted = false
+                        break
+                    }
+                }
+                
+                if (allGranted) {
+                    Log.d(TAG, "All permissions granted")
+                    Toast.makeText(this, "Permissions granted! App ready to use.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.w(TAG, "Some permissions denied")
+                    Toast.makeText(this, "Some permissions denied. App may not work fully.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+    
     private fun applySimpleEdgeDetection(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
@@ -199,21 +250,61 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         return (0.299 * r + 0.587 * g + 0.114 * b).toInt()
     }
     
-    private fun saveProcessedFrame(bitmap: Bitmap) {
-        try {
-            val filename = "${getExternalFilesDir(null)}/processed_frame.jpg"
-            val outputStream = FileOutputStream(filename)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            Log.d("WebExport", "Saved frame at: $filename")
-            
-            runOnUiThread {
-                Toast.makeText(this, "Frame saved for web viewer!", Toast.LENGTH_SHORT).show()
+    private fun saveCurrentFrameToWeb() {
+        synchronized(this) {
+            val frame = currentProcessedFrame
+            if (frame == null) {
+                Toast.makeText(this, "No processed frame available yet!", Toast.LENGTH_SHORT).show()
+                return
             }
-        } catch (e: IOException) {
-            Log.e("WebExport", "Error saving frame", e)
+            
+            // Save in background thread
+            Thread {
+                try {
+                    // Save to multiple accessible locations
+                    val timestamp = System.currentTimeMillis()
+                    
+                    // 1. Save to app's external files directory
+                    val appFilename = "${getExternalFilesDir(null)}/processed_frame.jpg"
+                    val appFile = File(appFilename)
+                    val outputStream = FileOutputStream(appFile)
+                    frame.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+                    outputStream.flush()
+                    outputStream.close()
+                    
+                    // 2. Save to Downloads folder (accessible via USB/ADB)
+                    val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+                    val downloadFile = File(downloadsDir, "edge_detection_frame_$timestamp.jpg")
+                    appFile.copyTo(downloadFile, overwrite = true)
+                    
+                    // 3. Save to Pictures folder (accessible via gallery)
+                    val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+                    val pictureFile = File(picturesDir, "EdgeDetection/processed_frame.jpg")
+                    pictureFile.parentFile?.mkdirs()
+                    appFile.copyTo(pictureFile, overwrite = true)
+                    
+                    Log.d("WebExport", "Frame saved to multiple locations:")
+                    Log.d("WebExport", "- App files: $appFilename")
+                    Log.d("WebExport", "- Downloads: ${downloadFile.absolutePath}")
+                    Log.d("WebExport", "- Pictures: ${pictureFile.absolutePath}")
+                    
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "📸 Frame saved! Check Downloads/Pictures folder", Toast.LENGTH_LONG).show()
+                    }
+                    
+                } catch (e: Exception) {
+                    Log.e("WebExport", "Error saving frame", e)
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "Error saving frame: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }.start()
         }
+    }
+    
+    private fun saveProcessedFrame(bitmap: Bitmap) {
+        // Legacy function - kept for compatibility
+        saveCurrentFrameToWeb()
     }
 
     override fun onResume() {
@@ -285,10 +376,10 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 // Simple edge detection using Android's built-in capabilities
                 val edgeBitmap = applySimpleEdgeDetection(bmpCopy)
 
-                // Save one frame for web viewer (only once)
-                if (!frameSaved) {
-                    saveProcessedFrame(edgeBitmap)
-                    frameSaved = true
+                // Store current processed frame for manual saving
+                synchronized(this@MainActivity) {
+                    currentProcessedFrame?.recycle()
+                    currentProcessedFrame = edgeBitmap.copy(edgeBitmap.config ?: Bitmap.Config.ARGB_8888, false)
                 }
 
                 runOnUiThread {
@@ -431,19 +522,4 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         cameraDevice = null
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (textureView.isAvailable) {
-                    openCamera()
-                }
-                Log.d(TAG, "Camera permission granted")
-            } else {
-                Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
-                Log.e(TAG, "Camera permission denied")
-                finish()
-            }
-        }
-    }
 }

@@ -47,8 +47,8 @@ frame.onerror = function () {
 };
 // Update stats every 2 seconds
 setInterval(updateStats, 2000);
-// Check for new frames every 5 seconds
-setInterval(checkForNewFrame, 5000);
+// Check for new frames every 2 seconds (faster refresh for manual saves)
+setInterval(checkForNewFrame, 2000);
 // Initial check
 setTimeout(checkForNewFrame, 1000);
 console.log("Edge Detection Viewer initialized!");

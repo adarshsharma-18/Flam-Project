@@ -17,10 +17,22 @@
     <h3>📱 Instructions:</h3>
     <ol>
       <li>Run the Android camera app</li>
-      <li>Wait for "Frame saved for web viewer!" message</li>
-      <li>Copy the processed_frame.jpg to this web folder</li>
-      <li>Refresh this page to see the result</li>
+      <li>Grant camera and storage permissions</li>
+      <li>Wait for edge detection to initialize</li>
+      <li>Tap the "📸 Save Frame" button when ready</li>
+      <li><strong>Copy frame to web viewer:</strong>
+        <ul style="margin-top: 8px;">
+          <li><strong>Method 1:</strong> Run <code>copy_frames.bat</code> (requires ADB)</li>
+          <li><strong>Method 2:</strong> Copy from <code>Pictures/EdgeDetection/</code> folder via USB</li>
+          <li><strong>Method 3:</strong> Copy from <code>Downloads/</code> folder</li>
+        </ul>
+      </li>
     </ol>
+    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin-top: 15px;">
+      <h4 style="color: #ff6b6b; margin-top: 0;">🔧 Quick Copy Methods:</h4>
+      <p><strong>ADB Method:</strong> <code>adb pull /sdcard/Pictures/EdgeDetection/processed_frame.jpg .</code></p>
+      <p><strong>USB Method:</strong> Connect phone → Open file manager → Copy from Pictures/EdgeDetection/</p>
+    </div>
   </div>
   
   <script src="main.js"></script>
