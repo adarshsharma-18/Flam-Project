@@ -116,15 +116,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 showProcessed = !showProcessed
                 toggleButton.text = if (showProcessed) "🔄 Show Raw" else "🔄 Show Processed"
                 
-                // Switch between TextureView and GLSurfaceView
-                if (showProcessed) {
-                    // Show processed view (GLSurfaceView on top)
-                    glSurfaceView.visibility = View.VISIBLE
-                    glSurfaceView.bringToFront()
-                } else {
-                    // Show raw camera feed (hide GLSurfaceView)
-                    glSurfaceView.visibility = View.GONE
-                }
+                switchViewLayout()
                 
                 Log.d(TAG, "View toggled to: ${if (showProcessed) "Processed" else "Raw"}")
             }
@@ -155,6 +147,11 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
             // Initialize RenderScript for edge detection
             initializeRenderScript()
+            
+            // Set initial layout (processed view by default)
+            Handler(mainLooper).postDelayed({
+                switchViewLayout()
+            }, 500)
             
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
@@ -210,6 +207,62 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 Toast.makeText(this, "Edge detection error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }, 2000) // Wait 2 seconds
+    }
+    
+    private fun switchViewLayout() {
+        val params = android.widget.RelativeLayout.LayoutParams(
+            android.widget.RelativeLayout.LayoutParams.MATCH_PARENT,
+            android.widget.RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+        
+        val smallParams = android.widget.RelativeLayout.LayoutParams(
+            120.dpToPx(),
+            160.dpToPx()
+        ).apply {
+            addRule(android.widget.RelativeLayout.ALIGN_PARENT_END)
+            addRule(android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM)
+            setMargins(16.dpToPx(), 16.dpToPx(), 16.dpToPx(), 16.dpToPx())
+        }
+        
+        if (showProcessed) {
+            // Processed view full screen, raw camera small
+            glSurfaceView.layoutParams = params
+            textureView.layoutParams = smallParams
+            
+            glSurfaceView.visibility = View.VISIBLE
+            textureView.visibility = View.VISIBLE
+            
+            // Bring processed view to front
+            glSurfaceView.bringToFront()
+            
+            // Bring controls to front
+            saveFrameButton.bringToFront()
+            toggleButton.bringToFront()
+            effectButton.bringToFront()
+            fpsText.bringToFront()
+            
+        } else {
+            // Raw camera full screen, processed view small
+            textureView.layoutParams = params
+            glSurfaceView.layoutParams = smallParams
+            
+            glSurfaceView.visibility = View.VISIBLE
+            textureView.visibility = View.VISIBLE
+            
+            // Bring raw camera to front
+            textureView.bringToFront()
+            
+            // Bring controls to front
+            saveFrameButton.bringToFront()
+            toggleButton.bringToFront()
+            effectButton.bringToFront()
+            fpsText.bringToFront()
+        }
+    }
+    
+    // Extension function to convert dp to pixels
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
     
     private fun checkAndRequestPermissions() {

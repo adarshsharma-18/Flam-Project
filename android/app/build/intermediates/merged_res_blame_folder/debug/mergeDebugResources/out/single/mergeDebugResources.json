@@ -8,8 +8,8 @@
         "source": "C:\\Users\\Adarsh Sharma\\.gradle\\daemon\\9.0-milestone-1\\com.example.cameraapp-main-33:\\drawable\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.example.cameraapp-debug-31:/layout_activity_main.xml.flat",
-        "source": "com.example.cameraapp-main-33:/layout/activity_main.xml"
+        "merged": "C:\\Users\\Adarsh Sharma\\.gradle\\daemon\\9.0-milestone-1\\com.example.cameraapp-debug-31:\\drawable_border_frame.xml.flat",
+        "source": "C:\\Users\\Adarsh Sharma\\.gradle\\daemon\\9.0-milestone-1\\com.example.cameraapp-main-33:\\drawable\\border_frame.xml"
     },
     {
         "merged": "C:\\Users\\Adarsh Sharma\\.gradle\\daemon\\9.0-milestone-1\\com.example.cameraapp-debug-31:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
