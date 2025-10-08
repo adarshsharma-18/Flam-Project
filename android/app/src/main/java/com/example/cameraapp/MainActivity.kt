@@ -12,6 +12,8 @@ import android.util.Log
 import android.opengl.GLSurfaceView
 import android.view.Surface
 import android.view.TextureView
+import java.io.FileOutputStream
+import java.io.IOException
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     
     private val processingExecutor = Executors.newSingleThreadExecutor()
     private val isProcessing = AtomicBoolean(false)
+    private var frameSaved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -195,6 +198,23 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         val b = pixel and 0xFF
         return (0.299 * r + 0.587 * g + 0.114 * b).toInt()
     }
+    
+    private fun saveProcessedFrame(bitmap: Bitmap) {
+        try {
+            val filename = "${getExternalFilesDir(null)}/processed_frame.jpg"
+            val outputStream = FileOutputStream(filename)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            outputStream.flush()
+            outputStream.close()
+            Log.d("WebExport", "Saved frame at: $filename")
+            
+            runOnUiThread {
+                Toast.makeText(this, "Frame saved for web viewer!", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: IOException) {
+            Log.e("WebExport", "Error saving frame", e)
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -264,6 +284,12 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             try {
                 // Simple edge detection using Android's built-in capabilities
                 val edgeBitmap = applySimpleEdgeDetection(bmpCopy)
+
+                // Save one frame for web viewer (only once)
+                if (!frameSaved) {
+                    saveProcessedFrame(edgeBitmap)
+                    frameSaved = true
+                }
 
                 runOnUiThread {
                     // Update OpenGL texture with edge detection result

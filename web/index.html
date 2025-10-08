@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge Detection Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🎯 Edge Detection Viewer</h1>
+  <div id="viewer">
+    <img id="frame" src="processed_frame.jpg" alt="Processed Frame" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI2VlZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIGZyYW1lIHlldCAtIFJ1biBBbmRyb2lkIGFwcCBmaXJzdCE8L3RleHQ+PC9zdmc+'">
+    <div id="stats">Waiting for processed frame...</div>
+  </div>
+  
+  <div id="instructions">
+    <h3>📱 Instructions:</h3>
+    <ol>
+      <li>Run the Android camera app</li>
+      <li>Wait for "Frame saved for web viewer!" message</li>
+      <li>Copy the processed_frame.jpg to this web folder</li>
+      <li>Refresh this page to see the result</li>
+    </ol>
+  </div>
+  
+  <script src="main.js"></script>
+</body>
+</html>
